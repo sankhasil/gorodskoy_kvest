@@ -15,7 +15,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: password
     volumes:
       - mongo_data:/data/db
-      - ./mongo-init/init.js:/docker-entrypoint-initdb.d/init.js:ro
+      - ./schema/init.js:/docker-entrypoint-initdb.d/init.js:ro
     networks:
       - treasurehunt-net
 
@@ -40,7 +40,7 @@ services:
   # ── Spring Boot Backend ────────────────────────────────
   backend:
     build:
-      context: ./backend
+      context: ./backend-api
       dockerfile: Dockerfile
     container_name: treasurehunt-api
     restart: unless-stopped
@@ -61,9 +61,9 @@ services:
       retries: 5
 
   # ── Angular Admin UI ───────────────────────────────────
-  angular-admin:
+  admin-ui:
     build:
-      context: ./angular-admin
+      context: ./admin-ui
       dockerfile: Dockerfile
     container_name: treasurehunt-admin-ui
     restart: unless-stopped
