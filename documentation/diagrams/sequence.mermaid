@@ -1,0 +1,70 @@
+sequenceDiagram
+    autonumber
+    participant P as 📱 Player (Flutter)
+    participant A as 🅰️ Admin (Angular)
+    participant API as 🍃 Spring Boot
+    participant SEC as 🔐 JWT Filter
+    participant DB as 🍃 MongoDB
+
+    Note over P,DB: ── AUTH FLOW ──
+
+    P->>API: POST /api/auth/login { email, password }
+    API->>DB: findUserByEmail()
+    DB-->>API: User document
+    API->>API: BCrypt verify password
+    API->>API: Generate JWT (role: PLAYER)
+    API-->>P: { token, role, userId }
+
+    Note over A,DB: ── ADMIN LOGIN ──
+
+    A->>API: POST /api/auth/login { email, password }
+    API->>DB: findUserByEmail()
+    DB-->>API: User (role: ADMIN)
+    API-->>A: { token, role: ADMIN }
+
+    Note over A,DB: ── ADMIN CREATES PUZZLE + CLUES ──
+
+    A->>SEC: POST /api/admin/puzzles [Bearer ADMIN JWT]
+    SEC->>SEC: Validate JWT + check ADMIN role
+    SEC->>API: Forward request
+    API->>DB: insert puzzle document
+    DB-->>API: saved puzzle { id }
+    API-->>A: 201 Created { puzzleId }
+
+    A->>SEC: POST /api/admin/puzzles/{id}/clues
+    SEC->>API: Forward (ADMIN validated)
+    API->>DB: insert clue linked to puzzleId
+    DB-->>API: saved clue
+    API-->>A: 201 Created { clueId }
+
+    Note over P,DB: ── PLAYER GAME FLOW ──
+
+    P->>SEC: GET /api/puzzles [Bearer PLAYER JWT]
+    SEC->>API: Forward (PLAYER validated)
+    API->>DB: findAllActivePuzzles()
+    DB-->>API: puzzles[]
+    API-->>P: puzzles list
+
+    P->>SEC: POST /api/game/start { puzzleId }
+    SEC->>API: Forward
+    API->>DB: create GameProgress { userId, puzzleId, clueIndex:0 }
+    DB-->>API: progress saved
+    API->>DB: getClue(puzzleId, index: 0)
+    DB-->>API: first clue
+    API-->>P: { clue, hint, type }
+
+    P->>SEC: POST /api/game/answer { progressId, answer }
+    SEC->>API: Forward
+    API->>DB: getProgress(progressId)
+    DB-->>API: GameProgress
+    API->>API: validate answer (case-insensitive)
+    API->>DB: update progress clueIndex++
+    API->>DB: getNextClue()
+    DB-->>API: next clue
+    API-->>P: { correct: true, nextClue }
+
+    Note over P,DB: ── PUZZLE COMPLETE ──
+
+    P->>SEC: POST /api/game/answer (final answer)
+    API->>DB: mark progress COMPLETED
+    API-->>P: { complete: true, score, timeTaken }

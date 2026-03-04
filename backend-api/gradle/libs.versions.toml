@@ -1,0 +1,99 @@
+[versions]
+spring-boot = "3.5.10"
+spring-dependency-management = "1.1.7"
+spring-modulith="1.4.7"
+springdoc = "2.8.15"
+spring-docker = "10.0.0"
+kotlin = "2.3.10"
+ktlint = "14.0.1"
+test-logger = "4.0.0"
+kotlin-logging = "7.0.14"
+sonarqube = "7.2.2.6593"
+kover = "0.9.7"
+strikt = "0.35.1"
+logbook = "3.12.3"
+springmockk = "4.0.2"
+kotlin-await = "4.3.0"
+resilience4j = "2.3.0"
+micrometer = "1.16.3"
+micrometer-tracing = "1.6.3"
+
+#MongoDB releated
+mongodb = "4.1.0-M2"
+
+wiremock-springboot = "3.10.6"
+# explicitly set because they are injected as sub dependencies with vulnerabilities (springdoc commons-lang3 and oauth2-client nimubs)
+apache-commons = "3.20.0"
+nimbus = "10.7"
+
+
+[libraries]
+spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
+spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
+spring-boot-starter-security = { module = "org.springframework.boot:spring-boot-starter-security" }
+spring-boot-oauth2-client = { module = "org.springframework.boot:spring-boot-starter-oauth2-client" }
+spring-boot-starter-ouath2-resource-server = { module = "org.springframework.boot:spring-boot-starter-oauth2-resource-server" }
+spring-modulith-core-starter = { module = "org.springframework.modulith:spring-modulith-starter-core", version.ref = "spring-modulith" }
+
+springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
+
+jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin" }
+
+#resilience4j dependencies
+resilience4j-spring-boot = { module = "io.github.resilience4j:resilience4j-spring-boot3", version.ref = "resilience4j" }
+spring-boot-aop = { module = "org.springframework.boot:spring-boot-starter-aop", version.ref = "spring-boot" }
+
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
+kotlin-logging = { module = "io.github.oshai:kotlin-logging-jvm", version.ref = "kotlin-logging" }
+kotlin-await = { module = "org.awaitility:awaitility-kotlin", version.ref = "kotlin-await"} # for testing
+
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+spring-modulith-starter-test = { module = "org.springframework.modulith:spring-modulith-starter-test", version.ref = "spring-modulith" }
+kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+strikt = { module = "io.strikt:strikt-core", version.ref = "strikt" }
+spring-mockk = { module = "com.ninja-squad:springmockk", version.ref = "springmockk" }
+
+wiremock-spring-boot = { module = "org.wiremock.integrations:wiremock-spring-boot", version.ref = "wiremock-springboot" }
+
+logbook-spring-boot-starter = { module = "org.zalando:logbook-spring-boot-starter", version.ref = "logbook" }
+
+micrometer-prometheus = { module = "io.micrometer:micrometer-registry-prometheus", version.ref = "micrometer" }
+micrometer-tracing-bom = { module = "io.micrometer:micrometer-tracing-bom", version.ref = "micrometer-tracing" }
+micrometer-core = { module = "io.micrometer:micrometer-core" }
+micrometer-tracing-bridge-brave = { module = "io.micrometer:micrometer-tracing-bridge-brave" }
+
+nimbus = { module = "com.nimbusds:nimbus-jose-jwt", version.ref = "nimbus" }
+apache-commons = { module = "org.apache.commons:commons-lang3", version.ref = "apache-commons" }
+
+spring-kafka = { module = "org.springframework.kafka:spring-kafka", version.ref = "kafka" }
+spring-kafka-test = { module = "org.springframework.kafka:spring-kafka-test", version.ref = "kafka" }
+spring-boot-starter-webflux = { module = "org.springframework.boot:spring-boot-starter-webflux" } # only for test!
+
+#for persistance layer
+spring-data-mongodb = { module = "org.springframework.boot:spring-boot-starter-data-mongodb" }
+
+
+[bundles]
+spring = ["spring-boot-starter-validation", "spring-boot-starter-web", "spring-boot-starter-actuator", "springdoc-openapi-starter-webmvc-ui", "spring-boot-starter-security", "spring-kafka", "spring-boot-oauth2-client", "nimbus", "apache-commons", "spring-modulith-core-starter", "spring-boot-starter-ouath2-resource-server"]
+kotlin = ["jackson-module-kotlin", "kotlin-reflect", "kotlin-logging"]
+resilience4j = ["spring-boot-aop", "resilience4j-spring-boot"]
+test = ["spring-boot-starter-test", "kotlin-test-junit5", "junit-platform-launcher", "strikt", "spring-mockk", "wiremock-spring-boot", "spring-modulith-starter-test", "kotlin-await", "spring-kafka-test", "spring-boot-starter-webflux"]
+logbook = ["logbook-spring-boot-starter"]
+prometheus = ["micrometer-prometheus"]
+datamongo = ["spring-data-mongodb"]
+
+[plugins]
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
+kotlin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
+docker-spring-boot-application = { id = "com.bmuschko.docker-spring-boot-application", version.ref = "spring-docker" }
+
+test-logger = { id = "com.adarshr.test-logger", version.ref = "test-logger" }
+
+sonarqube = { id = "org.sonarqube", version.ref = "sonarqube" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }

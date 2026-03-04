@@ -1,0 +1,83 @@
+version: '3.9'
+
+services:
+
+  # ── MongoDB ────────────────────────────────────────────
+  mongodb:
+    image: mongo:7.0
+    container_name: treasurehunt-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: treasurehunt
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongo_data:/data/db
+      - ./mongo-init/init.js:/docker-entrypoint-initdb.d/init.js:ro
+    networks:
+      - treasurehunt-net
+
+  # ── Mongo Express (DB UI) ──────────────────────────────
+  mongo-express:
+    image: mongo-express:1.0.2
+    container_name: treasurehunt-mongo-ui
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      ME_CONFIG_MONGODB_URL: mongodb://admin:password@mongodb:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin
+    depends_on:
+      - mongodb
+    networks:
+      - treasurehunt-net
+
+  # ── Spring Boot Backend ────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: treasurehunt-api
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      MONGO_URI: mongodb://admin:password@mongodb:27017/treasurehunt?authSource=admin
+      JWT_SECRET: treasure-hunt-dev-secret-key-minimum-256-bits-long
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - mongodb
+    networks:
+      - treasurehunt-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # ── Angular Admin UI ───────────────────────────────────
+  angular-admin:
+    build:
+      context: ./angular-admin
+      dockerfile: Dockerfile
+    container_name: treasurehunt-admin-ui
+    restart: unless-stopped
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+    networks:
+      - treasurehunt-net
+
+volumes:
+  mongo_data:
+    driver: local
+
+networks:
+  treasurehunt-net:
+    driver: bridge

@@ -1,0 +1,52 @@
+graph TB
+    subgraph Client Layer
+        FA[📱 Flutter App\niOS & Android]
+        AU[🅰️ Angular Admin UI\nWeb Browser]
+    end
+
+    subgraph API Gateway Layer
+        SB[🍃 Spring Boot Backend\nKotlin REST API :8080]
+        SEC[🔐 JWT Security Filter\nRole: ADMIN / PLAYER]
+    end
+
+    subgraph Data Layer
+        MDB[(🍃 MongoDB\n:27017)]
+        COL1[puzzles collection]
+        COL2[clues collection]
+        COL3[users collection]
+        COL4[game_progress collection]
+    end
+
+    FA -->|REST + JWT| SEC
+    AU -->|REST + JWT| SEC
+    SEC --> SB
+    SB --> MDB
+    MDB --- COL1
+    MDB --- COL2
+    MDB --- COL3
+    MDB --- COL4
+
+    subgraph Flutter Screens
+        FS1[Login Screen]
+        FS2[Puzzle List]
+        FS3[Active Clue Screen]
+        FS4[Admin Panel\nRole-gated]
+    end
+
+    subgraph Angular Pages
+        AP1[Login]
+        AP2[Dashboard]
+        AP3[Puzzle Manager CRUD]
+        AP4[Clue Editor]
+        AP5[User Manager]
+    end
+
+    FA --- FS1
+    FA --- FS2
+    FA --- FS3
+    FA --- FS4
+    AU --- AP1
+    AU --- AP2
+    AU --- AP3
+    AU --- AP4
+    AU --- AP5
